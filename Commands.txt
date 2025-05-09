@@ -1,0 +1,24 @@
+#command to create the taxirides dataset
+
+bq --location=us-west1 mk taxirides
+
+#command to create the taxirides.realtime table (empty schema that you will stream into later)
+
+bq --location=us-west1 mk \
+--time_partitioning_field timestamp \
+--schema ride_id:string,point_idx:integer,latitude:float,longitude:float,\
+timestamp:timestamp,meter_reading:float,meter_increment:float,ride_status:string,\
+passenger_count:integer -t taxirides.realtime
+
+#commands to move files needed for the Dataflow job
+
+gcloud storage cp gs://cloud-training/bdml/taxisrcdata/schema.json  gs://qwiklabs-gcp-04-06e0b733389a-bucket/tmp/schema.json
+gcloud storage cp gs://cloud-training/bdml/taxisrcdata/transform.js  gs://qwiklabs-gcp-04-06e0b733389a-bucket/tmp/transform.js
+gcloud storage cp gs://cloud-training/bdml/taxisrcdata/rt_taxidata.csv  gs://qwiklabs-gcp-04-06e0b733389a-bucket/tmp/rt_taxidata.csv
+
+
+#commands to ensure that the Dataflow API is enabled cleanly
+
+gcloud services disable dataflow.googleapis.com
+gcloud services enable dataflow.googleapis.com
+
